@@ -1,18 +1,24 @@
 // https://www.youtube.com/watch?v=nshyjApIovo
+
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
-import JokeCategories from './components/JokeCategories';
-// import useJokeCategories from './useJokeCategories';
+import { useEffect, useRef, useState } from 'react';
 
 const App = () => {
-  // const { categoryRef, CategoriesDropdown } = useJokeCategories();
   const categoryRef = useRef(null);
 
+  const [categories, setCategories] = useState([]);
   const [joke, setJoke] = useState('');
 
   useEffect(() => {
+    jokeCategories();
     randomJoke();
   }, []);
+
+  const jokeCategories = () => {
+    const url = 'https://api.chucknorris.io/jokes/categories';
+
+    axios.get(url).then((res) => setCategories([...categories, ...res.data]));
+  };
 
   const randomJoke = (category = '') => {
     const url = 'https://api.chucknorris.io/jokes/random';
@@ -36,8 +42,17 @@ const App = () => {
               <h1>Chuck Noris Joke</h1>
               <h3>{joke}</h3>
               <br />
-              {/* <CategoriesDropdown /> */}
-              <JokeCategories categoryRef={categoryRef} />
+              <label htmlFor='category'>Joke Category:</label>
+              {/* <input type='text' name='category' ref={categoryRef} /> */}
+
+              <select name='category' id='category' ref={categoryRef}>
+                <option value=''>ALL</option>
+                {categories.map((cat, index) => (
+                  <option value={cat} key={index}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
               <br />
               <br />
               <button>Generate New Joke</button>
